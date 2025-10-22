@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prototype</title>
+    <style>
+      :root {
+        --bg: #0b1020;
+        --card: #111730;
+        --card-2: #0e142a;
+        --text: #e9eefc;
+        --muted: #a9b2d0;
+        --brand: #7aa2ff;
+        --border: #22305f;
+        --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+      }
+
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
+          Inter, Helvetica Neue, Arial;
+        background: var(--bg);
+        color: var(--text);
+      }
+
+        button {
+        margin: 20px;
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: var(--brand);
+        color: var(--text);
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .container {
+        margin: 0 auto;
+        padding: 20px;
+        text-align: center;
+        display: flex;
+        flex-wrap: wrap; 
+        justify-content: center;
+        flex-direction: row;
+        align-items: flex-start;
+      }
+
+      h1 {
+        text-align: center;
+        margin-top: 40px;
+        margin: auto;
+        padding-top: 20px;
+      }
+
+    .card {
+        width: 400px;  
+        height: auto; 
+        margin: 10px; 
+        font-size: 18px;
+        line-height: 1.6;
+        background-color: #22305f;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: left;
+      }
+
+      .navigation {
+        text-align: center;
+        margin-top: 20px;
+      }
+
+    </style>
+</head>
+<body>
+    <header>
+      <h1>Design Prototype Guide</h1>
+    </header>
+
+    <div class="navigation">
+        <button onclick="history.back()">Go Back</button>
+    </div>
+
+    <div class="container">
+
+        <div class="card">
+            <p style="color: rgb(189, 66, 66); text-align: center; font-weight: bold;">Problem</p>
+            <p>
+                Say you have an object, and you want to create an exact copy of it. How would you do it? First, you have to create a new object of the same class. Then you have to go through all the fields of the original object and copy their values over to the new object. 
+            </p>
+            <p>
+                Nice! But there’s a catch. Not all objects can be copied that way because some of the object’s fields may be private and not visible from outside of the object itself.
+            </p>
+
+            <img src="https://refactoring.guru/images/patterns/content/prototype/prototype-comic-1-en.png" alt="Result of copying an object without Prototype pattern" style="max-width: 100%; height: auto; border-radius: 10px;">
+
+            <p>
+                There’s one more problem with the direct approach. Since you have to know the object’s class to create a duplicate, your code becomes dependent on that class. If the extra dependency doesn’t scare you, there’s another catch. Sometimes you only know the interface that the object follows, but not its concrete class, when, for example, a parameter in a method accepts any objects that follow some interface.
+            </p>
+        </div>
+
+        <div class="card">
+            <p style="color: rgb(39, 184, 39); text-align: center; font-weight: bold;">Solution</p>
+
+            <p>
+                The Prototype pattern delegates the cloning process to the actual objects that are being cloned. The pattern declares a common interface for all objects that support cloning. This interface lets you clone an object without coupling your code to the class of that object. Usually, such an interface contains just a single clone method.
+            </p>
+            <p>
+
+                The implementation of the clone method is very similar in all classes. The method creates an object of the current class and carries over all of the field values of the old object into the new one. You can even copy private fields because most programming languages let objects access private fields of other objects that belong to the same class.
+            </p>
+            <p>
+
+                An object that supports cloning is called a prototype. When your objects have dozens of fields and hundreds of possible configurations, cloning them might serve as an alternative to subclassing.
+            </p>
+
+            <img src="https://refactoring.guru/images/patterns/content/prototype/prototype-comic-2-en.png" alt="Result of copying an object with Prototype pattern" style="max-width: 100%; height: auto; border-radius: 10px;">
+
+            <p>
+                Here’s how it works: you create a set of objects, configured in various ways. When you need an object like the one you’ve configured, you just clone a prototype instead of constructing a new object from scratch.
+            </p>
+        </div>
+
+        <div class="card">
+            <p style="color: rgb(152, 152, 233); text-align: center; font-weight: bold;">Real-World Analogy</p>
+
+            <p>
+                In real life, prototypes are used for performing various tests before starting mass production of a product. However, in this case, prototypes don’t participate in any actual production, playing a passive role instead.
+            </p>
+
+            <img src="https://refactoring.guru/images/patterns/content/prototype/prototype-comic-3-en.png" alt="Real-world prototype analogy" style="max-width: 100%; height: auto; border-radius: 10px;">
+
+            <p>
+                Since industrial prototypes don’t really copy themselves, a much closer analogy to the pattern is the process of mitotic cell division (biology, remember?). After mitotic division, a pair of identical cells is formed. The original cell acts as a prototype and takes an active role in creating the copy.
+            </p>
+        </div>
+
+        <div class="card">
+            <p style="color: gray; text-align: center; font-weight: bold;">Structure</p>
+                <div><span style="font-weight: bold;">1. Basic implementation</span>
+                    <p>
+                        1. The Prototype interface declares the cloning methods. In most cases, it’s a single clone method.
+                    </p>
+
+                    <p>
+                        2. The Concrete Prototype class implements the cloning method. In addition to copying the original object’s data to the clone, this method may also handle some edge cases of the cloning process related to cloning linked objects, untangling recursive dependencies, etc.
+                    </p>
+
+                    <p>
+                        3. The Client can produce a copy of any object that follows the prototype interface.
+                    </p>
+
+                    <img src="https://refactoring.guru/images/patterns/diagrams/prototype/structure.png" alt="Prototype pattern structure" style="max-width: 100%; height: auto; border-radius: 10px;">
+                </div>
+
+                <hr>
+
+                <div><span style="font-weight: bold;">2. Prototype registry implementation</span>
+                    <p>
+                        1. The Prototype Registry provides an easy way to access frequently-used prototypes. It stores a set of pre-built objects that are ready to be copied. The simplest prototype registry is a name → prototype hash map. However, if you need better search criteria than a simple name, you can build a much more robust version of the registry.
+                    </p>
+
+                    <img src="https://refactoring.guru/images/patterns/diagrams/prototype/structure-prototype-cache.png" alt="Prototype pattern structure with registry" style="max-width: 100%; height: auto; border-radius: 10px;">
+                </div>
+
+                <hr>
+
+                <div><span style="font-weight: bold;">3. #Pseudocode</span>
+                    <p>1. In this example, the Prototype pattern lets you produce exact copies of geometric objects, without coupling the code to their classes.</p>
+
+                    <img src="https://refactoring.guru/images/patterns/diagrams/prototype/example.png" alt="Prototype pattern pseudocode example" style="max-width: 100%; height: auto; border-radius: 10px;">
+
+                    <p></p>
+                </div>
+        </div>
+
+    </div>
+</body>
+</html>
