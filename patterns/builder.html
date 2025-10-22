@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Builder Pattern</title>
+    <link rel="stylesheet" href="../css/style.css" />
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <span class="badge">Design Patterns</span>
+            <h1 class="title">The <span style="color:var(--brand)">Builder</span> Pattern</h1>
+            <p class="subtitle">
+                Builder is a creational design pattern that lets you construct complex objects step by step, separating
+                the construction process from the final representation.
+            </p>
+        </header>
+
+        <section class="card">
+            <h2>Concept</h2>
+            <p>
+                The main idea is to extract the object construction logic into a separate <code
+                    class="inline">Builder</code>, which assembles the final product step by step.
+            </p>
+            <ul>
+                <li>Separates construction from representation</li>
+                <li>Allows creating different variations of an object</li>
+                <li>Useful for objects with complex structures</li>
+            </ul>
+        </section>
+
+        <section class="card">
+            <h2>Example (Java)</h2>
+            <pre><code>
+// Product
+class House {
+    String walls;
+    String roof;
+    String interior;
+}
+
+// Builder
+interface HouseBuilder {
+    void buildWalls();
+    void buildRoof();
+    void buildInterior();
+    House getResult();
+}
+
+// Concrete Builder
+class WoodenHouseBuilder implements HouseBuilder {
+    private House house = new House();
+
+    public void buildWalls() { house.walls = "Wooden walls"; }
+    public void buildRoof() { house.roof = "Shingle roof"; }
+    public void buildInterior() { house.interior = "Wooden interior"; }
+
+    public House getResult() { return house; }
+}
+
+// Director
+class Director {
+    private HouseBuilder builder;
+    Director(HouseBuilder builder) { this.builder = builder; }
+
+    House construct() {
+        builder.buildWalls();
+        builder.buildRoof();
+        builder.buildInterior();
+        return builder.getResult();
+    }
+}
+
+// Usage
+public class Main {
+    public static void main(String[] args) {
+        HouseBuilder builder = new WoodenHouseBuilder();
+        Director director = new Director(builder);
+        House house = director.construct();
+        System.out.println(house.walls);
+    }
+}
+      </code></pre>
+        </section>
+
+        <section class="card">
+            <h2>When to Use</h2>
+            <ul>
+                <li>When an object requires step-by-step creation</li>
+                <li>When different representations of the same object are needed</li>
+                <li>When the construction process should be independent of the parts</li>
+            </ul>
+        </section>
+
+        <footer>
+            © 2025 Design Patterns Guide
+        </footer>
+    </div>
+
+</body>
+
+</html>
