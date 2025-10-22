@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Патерн Facade</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+
+        h1,
+        h2,
+        h3 {
+            color: #333;
+        }
+
+        code {
+            background-color: #eaeaea;
+            padding: 2px 5px;
+            border-radius: 4px;
+        }
+
+        pre {
+            background-color: #eaeaea;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+
+
+        .collumnclass {
+            width: 100%;
+            height: 100vh;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: 1fr 1fr 1fr;
+            gap: 20px;
+            /* background-color: aqua; */
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .CardBack {
+            width: auto;
+            height: min-content;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            background-color: #ffffff;
+            padding: 20px;
+            box-sizing: border-box;
+            border-radius: 8px;
+            transition: transform 0.3s ease;
+
+        }
+
+        .CardBack:hover {
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Патерн Facade</h1>
+    <div class="collumnclass">
+        <div class="CardBack">
+            <h2>Що це?</h2>
+            <p>Facade — структурний патерн проектування, який забезпечує спрощений інтерфейс до складної системи класів,
+                бібліотеки або фреймворку.</p>
+        </div>
+
+
+
+
+
+        <div class="CardBack">
+            <h2>Аналогія з життя</h2>
+            <p>Замовлення по телефону в магазині. Оператор – це ваш фасад: він взаємодіє із системою замовлень, оплатою
+                та доставкою, надаючи простий інтерфейс.</p>
+        </div>
+        <div class="CardBack">
+            <h2>Структура</h2>
+            <p>Фасад знає, які класи підсистеми викликати та які дані передати. Підсистема працює без знання про фасад,
+                а клієнт використовує лише фасад.</p>
+        </div>
+
+
+        <div class="CardBack">
+            <h2>Взаємозв’язок з іншими патернами</h2>
+            <p>Фасад створює спрощений інтерфейс до підсистеми, на відміну від адаптера, який дозволяє двом існуючим
+                інтерфейсам працювати разом. Фасад не додає нової функціональності, а лише спрощує доступ до підсистеми.
+            </p>
+        </div>
+        <div class="CardBack">
+            <h2>Переваги та недоліки</h2>
+            <ul>
+                <li>Ізолює клієнтів від складних підсистем.</li>
+                <li>Фасад може стати "божественним об’єктом", пов’язаним з усіма класами.</li>
+            </ul>
+        </div>
+        <div class="CardBack">
+            <h2>Проблема</h2>
+            <p>Якщо ваш код працює зі складною бібліотекою, доводиться самостійно ініціалізувати об’єкти,
+                відслідковувати залежності та порядок їх використання. Це ускладнює бізнес-логіку та робить код важким
+                для підтримки.</p>
+        </div>
+        <div class="CardBack">
+            <h2>Рішення</h2>
+            <p>Facade надає простий інтерфейс для роботи зі складною системою. Він ховає деталі реалізації, залишаючи
+                лише необхідні функції для клієнта.</p>
+            <p>Наприклад, додаток для завантаження відео котиків може використовувати складну бібліотеку для кодування
+                відео, але клієнтський код потребує лише метод <code>encode(filename, format)</code>. Створивши клас з
+                цим методом, ми реалізуємо фасад.</p>
+        </div>
+    </div>
+
+</body>
+
+</html>
