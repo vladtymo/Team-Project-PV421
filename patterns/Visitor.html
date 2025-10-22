@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>The Visitor Pattern — A Practical Guide</title>
+    <meta
+      name="description"
+      content="A concise, practical guide to the Visitor design pattern with examples in Java, C#, JavaScript, and Python."
+    />
+    <style>
+      /* ---- base styles (copied from your Singleton example) ---- */
+      :root {
+        --bg: #0b1020;
+        --card: #111730;
+        --card-2: #0e142a;
+        --text: #e9eefc;
+        --muted: #a9b2d0;
+        --brand: #7aa2ff;
+        --accent: #55e6c1;
+        --border: #22305f;
+        --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+      }
+      @media (prefers-color-scheme: light) {
+        :root {
+          --bg: #f6f7fb;
+          --card: #ffffff;
+          --card-2: #f9faff;
+          --text: #0b1020;
+          --muted: #475070;
+          --brand: #2d5bff;
+          --accent: #0bb88e;
+          --border: #e5e8f4;
+          --code: #0b1020;
+          --shadow: 0 10px 24px rgba(12, 24, 64, 0.08);
+        }
+      }
+      body {
+        margin: 0;
+        font-family: system-ui, sans-serif;
+        background: radial-gradient(
+            1200px 600px at 10% -10%,
+            rgba(122, 162, 255, 0.15),
+            transparent 60%
+          ),
+          radial-gradient(
+            1000px 500px at 110% 10%,
+            rgba(85, 230, 193, 0.12),
+            transparent 60%
+          ),
+          var(--bg);
+        color: var(--text);
+      }
+      .container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 32px 20px 64px;
+      }
+      header {
+        display: grid;
+        gap: 14px;
+        margin-bottom: 26px;
+      }
+      .title {
+        font-size: clamp(28px, 4vw, 48px);
+      }
+      .subtitle {
+        color: var(--muted);
+      }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: var(--brand);
+        background: color-mix(in oklab, var(--brand) 12%, transparent);
+        border: 1px solid color-mix(in oklab, var(--brand) 35%, var(--border));
+        padding: 6px 10px;
+        border-radius: 999px;
+      }
+      .grid {
+        display: grid;
+        gap: 18px;
+        grid-template-columns: repeat(12, 1fr);
+      }
+      .card {
+        grid-column: span 12;
+        background: linear-gradient(180deg, var(--card), var(--card-2));
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+        padding: 20px;
+      }
+      @media (min-width: 900px) {
+        .card.span-4 {
+          grid-column: span 4;
+        }
+        .card.span-6 {
+          grid-column: span 6;
+        }
+        .card.span-8 {
+          grid-column: span 8;
+        }
+      }
+      pre {
+        background: var(--card-2);
+        border: 1px solid var(--border);
+        padding: 12px;
+        border-radius: 10px;
+        overflow: auto;
+      }
+      code.inline {
+        background: color-mix(in oklab, var(--text) 8%, transparent);
+        border: 1px solid var(--border);
+        padding: 2px 6px;
+        border-radius: 6px;
+      }
+      ul {
+        margin-left: 20px;
+      }
+      .muted {
+        color: var(--muted);
+      }
+      footer {
+        margin-top: 40px;
+        opacity: 0.75;
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .diagram {
+        width: 100%;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: var(--card-2);
+        padding: 6px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <header>
+        <span class="badge">Design Pattern • Behavioral</span>
+        <h1 class="title">The Visitor Pattern</h1>
+        <p class="subtitle">
+          Represent an operation to be performed on elements of an object
+          structure. The Visitor lets you define a new operation without
+          changing the classes of the elements on which it operates.
+        </p>
+      </header>
+
+      <section class="grid">
+        <article class="card span-8">
+          <h2>When to Use</h2>
+          <ul>
+            <li>
+              When you need to perform new operations on a structure of objects
+              without modifying their classes.
+            </li>
+            <li>
+              When many unrelated operations must be performed on the same set
+              of classes.
+            </li>
+            <li>
+              When classes form a structure and you want to separate data from
+              behavior.
+            </li>
+          </ul>
+        </article>
+
+        <aside class="card span-4">
+          <h2>Checklist</h2>
+          <ul>
+            <li>Define a <code class="inline">Visitor</code> interface</li>
+            <li>
+              Each element implements
+              <code class="inline">accept(Visitor v)</code>
+            </li>
+            <li>
+              Concrete visitors implement behavior for each element type
+            </li>
+            <li>
+              Clients traverse elements and call
+              <code class="inline">accept()</code>
+            </li>
+          </ul>
+        </aside>
+
+        <article class="card span-12">
+          <h2>UML Snapshot</h2>
+          <svg
+            class="diagram"
+            viewBox="0 0 800 220"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <defs>
+              <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#7aa2ff" stop-opacity="0.7" />
+                <stop offset="100%" stop-color="#55e6c1" stop-opacity="0.7" />
+              </linearGradient>
+              <marker
+                id="arrow"
+                markerWidth="10"
+                markerHeight="10"
+                refX="6"
+                refY="3"
+                orient="auto"
+              >
+                <path d="M0,0 L0,6 L6,3 z" fill="currentColor" />
+              </marker>
+            </defs>
+            <rect
+              x="30"
+              y="30"
+              width="220"
+              height="80"
+              rx="10"
+              fill="url(#g)"
+              opacity="0.08"
+              stroke="currentColor"
+            />
+            <text x="140" y="55" text-anchor="middle" font-weight="600">
+              Element
+            </text>
+            <line x1="30" y1="65" x2="250" y2="65" stroke="currentColor" />
+            <text x="40" y="85">+ accept(v: Visitor)</text>
+
+            <rect
+              x="300"
+              y="30"
+              width="240"
+              height="80"
+              rx="10"
+              fill="url(#g)"
+              opacity="0.08"
+              stroke="currentColor"
+            />
+            <text x="420" y="55" text-anchor="middle" font-weight="600">
+              ConcreteElement
+            </text>
+            <line x1="300" y1="65" x2="540" y2="65" stroke="currentColor" />
+            <text x="310" y="85">+ accept(v: Visitor)</text>
+
+            <rect
+              x="580"
+              y="30"
+              width="180"
+              height="80"
+              rx="10"
+              fill="url(#g)"
+              opacity="0.08"
+              stroke="currentColor"
+            />
+            <text x="670" y="55" text-anchor="middle" font-weight="600">
+              Visitor
+            </text>
+            <line x1="580" y1="65" x2="760" y2="65" stroke="currentColor" />
+            <text x="590" y="85">+ visit(elem: Element)</text>
+
+            <line
+              x1="540"
+              y1="70"
+              x2="580"
+              y2="70"
+              stroke="currentColor"
+              marker-end="url(#arrow)"
+            />
+          </svg>
+        </article>
+
+        <article class="card span-12">
+          <h2>Idiomatic Implementations</h2>
+
+          <h3>Java</h3>
+          <pre><code>interface Visitor {
+  void visit(Book book);
+  void visit(CD cd);
+}
+
+interface Item {
+  void accept(Visitor v);
+}
+
+class Book implements Item {
+  public void accept(Visitor v) { v.visit(this); }
+}
+
+class CD implements Item {
+  public void accept(Visitor v) { v.visit(this); }
+}
+
+class PriceVisitor implements Visitor {
+  public void visit(Book book) { System.out.println("Book price: $10"); }
+  public void visit(CD cd) { System.out.println("CD price: $5"); }
+}
+</code></pre>
+
+          <h3>C#</h3>
+          <pre><code>interface IVisitor {
+    void Visit(Book book);
+    void Visit(CD cd);
+}
+
+interface IItem {
+    void Accept(IVisitor visitor);
+}
+
+class Book : IItem {
+    public void Accept(IVisitor visitor) => visitor.Visit(this);
+}
+
+class CD : IItem {
+    public void Accept(IVisitor visitor) => visitor.Visit(this);
+}
+
+class PriceVisitor : IVisitor {
+    public void Visit(Book book) => Console.WriteLine("Book price: $10");
+    public void Visit(CD cd) => Console.WriteLine("CD price: $5");
+}
+</code></pre>
+
+          <h3>JavaScript</h3>
+          <pre><code>class Book {
+  accept(visitor) { visitor.visitBook(this); }
+}
+class CD {
+  accept(visitor) { visitor.visitCD(this); }
+}
+class PriceVisitor {
+  visitBook() { console.log("Book price: $10"); }
+  visitCD() { console.log("CD price: $5"); }
+}
+const items = [new Book(), new CD()];
+const visitor = new PriceVisitor();
+items.forEach(i => i.accept(visitor));
+</code></pre>
+
+          <h3>Python</h3>
+          <pre><code>class Visitor:
+    def visit_book(self, book): pass
+    def visit_cd(self, cd): pass
+
+class Book:
+    def accept(self, v): v.visit_book(self)
+
+class CD:
+    def accept(self, v): v.visit_cd(self)
+
+class PriceVisitor(Visitor):
+    def visit_book(self, book): print("Book price: $10")
+    def visit_cd(self, cd): print("CD price: $5")
+
+for item in [Book(), CD()]:
+    item.accept(PriceVisitor())
+</code></pre>
+        </article>
+
+        <article class="card span-6">
+          <h2>Pros & Cons</h2>
+          <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 10px">
+            <div>
+              <h3>✅ Benefits</h3>
+              <ul>
+                <li>Add new operations easily</li>
+                <li>Keeps related behavior together</li>
+                <li>Clean separation of algorithms from objects</li>
+              </ul>
+            </div>
+            <div>
+              <h3>⚠️ Pitfalls</h3>
+              <ul>
+                <li>Adding new element types is hard</li>
+                <li>Breaks encapsulation sometimes</li>
+                <li>Can get complex with many classes</li>
+              </ul>
+            </div>
+          </div>
+        </article>
+
+        <article class="card span-6">
+          <h2>Alternatives</h2>
+          <ul>
+            <li><strong>Strategy:</strong> if operations are independent.</li>
+            <li><strong>Command:</strong> encapsulate action in objects.</li>
+            <li>
+              <strong>Double Dispatch:</strong> core mechanism used by Visitor.
+            </li>
+          </ul>
+        </article>
+      </section>
+
+      <footer>
+        <p>© 2025 Visitor Pattern Guide. Built as a single HTML file.</p>
+      </footer>
+    </div>
+  </body>
+</html>
