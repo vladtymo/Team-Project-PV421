@@ -63,11 +63,36 @@
 
             transform: scale(1.05);
         }
+
+        .Button {
+            width: 100px;
+            height: 50px;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 8px;
+            font-weight: bold;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+        }
+        .Header
+        {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+        }
     </style>
 </head>
 
 <body>
-    <h1>Патерн Facade</h1>
+    <div class="Header">
+        <h1>Патерн Facade</h1>
+        <a href="/" class="Button">Back</a>
+    </div>
+
     <div class="collumnclass">
         <div class="CardBack">
             <h2>Що це?</h2>
