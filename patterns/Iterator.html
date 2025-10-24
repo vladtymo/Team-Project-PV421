@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Патерн Iterator — Огляд</title>
+  <style>
+    :root{--bg:#0f1724;--card:#0b1220;--accent:#06b6d4;--muted:#9aa4b2;--glass:rgba(255,255,255,0.03)}
+    body{font-family:Inter,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(180deg,#071029 0%,#081022 100%);color:#e6eef6;margin:0;padding:24px}
+    .container{max-width:980px;margin:0 auto}
+    header{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+    .logo{background:var(--glass);padding:10px 14px;border-radius:10px;font-weight:700}
+    nav{display:flex;gap:8px}
+    .menu{background:transparent;border-radius:10px;padding:8px 12px;color:var(--muted);border:1px solid transparent}
+    .menu.active{color:var(--accent);border-color:rgba(6,182,212,0.12);box-shadow:0 6px 18px rgba(6,182,212,0.06);}
+    main{display:grid;grid-template-columns:1fr 320px;gap:18px}
+    .card{background:var(--card);padding:18px;border-radius:12px;box-shadow:0 6px 20px rgba(2,6,23,0.6)}
+    h1{margin:0 0 8px;font-size:20px}
+    h2{margin:12px 0 6px;font-size:16px}
+    p{color:var(--muted);line-height:1.5}
+    pre{background:#031021;padding:12px;border-radius:8px;overflow:auto;color:#cfeef6}
+    code{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono",monospace;font-size:13px}
+    .sidebar .muted{font-size:13px;color:var(--muted);}
+    .btn{display:inline-block;padding:8px 12px;border-radius:8px;background:linear-gradient(90deg,var(--accent),#7ce0ff);color:#052022;text-decoration:none;font-weight:600}
+    .kbd{background:#051426;padding:6px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.03)}
+    footer{margin-top:18px;color:var(--muted);font-size:13px}
+    /* responsive */
+    @media (max-width:900px){main{grid-template-columns:1fr} .sidebar{order:2}}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">Design Patterns</div>
+      <nav>
+        <a class="menu">Home</a>
+        <a class="menu">Creational</a>
+        <a class="menu">Structural</a>
+        <a class="menu active">Iterator</a>
+        <a class="menu">Behavioral</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="card content">
+        <h1>Iterator (Ітератор)</h1>
+        <p><strong>Мета:</strong> Надати спосіб послідовного доступу до елементів колекції без розкриття її внутрішньої структури.</p>
+
+        <h2>Коли використовувати</h2>
+        <p>Коли потрібно обійти складну структуру даних (масиви, списки, дерева) послідовно; якщо треба підтримувати кілька одночасних проходів по колекції або різні способи ітерації (вперед, назад, фільтрація) без зміни самих колекцій.</p>
+
+        <h2>Структура (спрощена)</h2>
+        <pre><code>// Абстрактний інтерфейс ітератора
+interface Iterator&lt;T&gt; {
+  boolean hasNext();
+  T next();
+}
+
+// Колекція повертає ітератор
+interface IterableCollection&lt;T&gt; {
+  Iterator&lt;T&gt; createIterator();
+}
+
+// Конкретна колекція + конкретний ітератор
+class MyList implements IterableCollection&lt;T&gt; { ... }
+class MyListIterator implements Iterator&lt;T&gt; { ... }</code></pre>
+
+        <h2>UML (мінімальне)</h2>
+        <pre><code>Client --> Iterator
+Client --> Aggregate
+Aggregate --> ConcreteAggregate
+Iterator <|-- ConcreteIterator
+Aggregate <|-- ConcreteAggregate</code></pre>
+
+        <h2>Приклад: C# (простий)</h2>
+        <pre><code>// Простий ітератор для масиву
+public interface IIterator&lt;T&gt; {
+    bool HasNext();
+    T Next();
+}
+
+public class ArrayIterator&lt;T&gt; : IIterator&lt;T&gt; {
+    private readonly T[] _items;
+    private int _index = 0;
+    public ArrayIterator(T[] items) => _items = items;
+    public bool HasNext() => _index &lt; _items.Length;
+    public T Next() => _items[_index++];
+}
+
+public class SimpleCollection&lt;T&gt; {
+    private readonly T[] _items;
+    public SimpleCollection(T[] items) => _items = items;
+    public IIterator&lt;T&gt; CreateIterator() => new ArrayIterator&lt;T&gt;(_items);
+}
+
+// Використання:
+var names = new SimpleCollection&lt;string&gt;(new[] {"Іван","Оля","Петро"});
+var it = names.CreateIterator();
+while(it.HasNext()) Console.WriteLine(it.Next());</code></pre>
+
+        <h2>Приклад: JavaScript (ітератор + генератор)</h2>
+        <pre><code>class SimpleCollection {
+  constructor(items){ this.items = items }
+  // стандартний ітератор ES
+  [Symbol.iterator]() {
+    let index = 0; const items = this.items;
+    return { next: () => index &lt; items.length ? {value: items[index++], done:false} : {done:true} };
+  }
+}
+
+const c = new SimpleCollection([1,2,3]);
+for(const v of c) console.log(v);</code></pre>
+
+        <h2>Плюси / Мінуси</h2>
+        <p><strong>Плюси:</strong> відокремлює логіку обходу від структури даних; дозволяє різні способи обходу; підтримує одночасні обходи.</p>
+        <p><strong>Мінуси:</strong> додає додаткові класи; може ускладнити прості колекції.</p>
+
+        <h2>Коли не варто</h2>
+        <p>Якщо колекція дуже проста (наприклад, звичайний масив з мовними циклами) — додаткові класи і код можуть бути зайвими.</p>
+
+        <footer>
+          <p class="muted">Порада: у .NET і Java є вбудовані інтерфейси для ітераторів (IEnumerable/IEnumerator, Iterator), використай їх коли можеш.</p>
+        </footer>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    document.getElementById('copyCs')?.addEventListener('click', ()=>{
+      const cs = `public interface IIterator<T> {\n    bool HasNext();\n    T Next();\n}\n\npublic class ArrayIterator<T> : IIterator<T> {\n    private readonly T[] _items;\n    private int _index = 0;\n    public ArrayIterator(T[] items) => _items = items;\n    public bool HasNext() => _index < _items.Length;\n    public T Next() => _items[_index++];\n}\n\npublic class SimpleCollection<T> {\n    private readonly T[] _items;\n    public SimpleCollection(T[] items) => _items = items;\n    public IIterator<T> CreateIterator() => new ArrayIterator<T>(_items);\n}`;
+      navigator.clipboard?.writeText(cs).then(()=>{
+        alert('C# приклад скопійовано');
+      }).catch(()=>alert('Не вдалось скопіювати — можливо браузер заблокував буфер обміну'));
+    });
+  </script>
+</body>
+</html>
