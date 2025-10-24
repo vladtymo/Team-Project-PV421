@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>(Decorator)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f9f9f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        section {
+            padding: 20px 40px;
+        }
+        h2 {
+            color: #2c3e50;
+        }
+        pre {
+            background-color: #eee;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        .uml {
+            font-family: monospace;
+            background-color: #fafafa;
+            border: 1px solid #ccc;
+            padding: 10px;
+            white-space: pre;
+        }
+        footer {
+            background-color: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Патерн Декоратор (Decorator)</h1>
+    </header>
+
+    <section>
+        <h2>Опис</h2>
+        <p>
+            Патерн <strong>Декоратор (Decorator)</strong> належить до структурних патернів проектування.
+            Він дозволяє динамічно додавати нову функціональність об’єктам, не змінюючи їхній код.
+            Декоратори обгортають початковий об’єкт, реалізуючи той самий інтерфейс, і можуть розширювати його поведінку.
+        </p>
+    </section>
+
+    <section>
+        <h2>UML-діаграма (спрощено)</h2>
+        <div class="uml">
+Component
+   ↑
+ConcreteComponent
+   ↑
+Decorator
+   ↑
+ConcreteDecorator
+        </div>
+    </section>
+
+    <section>
+        <h2>Приклад (на Python)</h2>
+        <pre><code>
+from abc import ABC, abstractmethod
+
+# Базовий компонент
+class Coffee(ABC):
+    @abstractmethod
+    def cost(self):
+        pass
+
+# Конкретний компонент
+class SimpleCoffee(Coffee):
+    def cost(self):
+        return 10
+
+# Базовий декоратор
+class CoffeeDecorator(Coffee):
+    def __init__(self, coffee):
+        self._coffee = coffee
+
+    def cost(self):
+        return self._coffee.cost()
+
+# Конкретні декоратори
+class MilkDecorator(CoffeeDecorator):
+    def cost(self):
+        return super().cost() + 3
+
+class SugarDecorator(CoffeeDecorator):
+    def cost(self):
+        return super().cost() + 2
+
+# Використання
+coffee = SimpleCoffee()
+print(coffee.cost())  # 10
+
+coffee_with_milk = MilkDecorator(coffee)
+print(coffee_with_milk.cost())  # 13
+
+coffee_with_milk_and_sugar = SugarDecorator(coffee_with_milk)
+print(coffee_with_milk_and_sugar.cost())  # 15
+        </code></pre>
+    </section>
+
+    <section>
+        <h2>Переваги</h2>
+        <ul>
+            <li>Гнучке додавання нової поведінки без зміни існуючого коду.</li>
+            <li>Можна комбінувати декоратори для створення складних ефектів.</li>
+            <li>Відповідає принципу відкритості/закритості (OCP).</li>
+        </ul>
+
+        <h2>Недоліки</h2>
+        <ul>
+            <li>Код може стати складнішим через велику кількість обгорток.</li>
+            <li>Важче налагоджувати, коли багато рівнів декорування.</li>
+        </ul>
+    </section>
+
+    <footer>
+        &copy; 2025. Приклад сторінки про патерн Декоратор.
+    </footer>
+</body>
+</html>
