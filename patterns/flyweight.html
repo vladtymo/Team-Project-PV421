@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flyweight Pattern</title>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <span class="badge">Design Patterns</span>
+      <button class="btn" onclick="goHome()">Back to Home</button>
+      <h1 class="title">The <span style="color:var(--brand)">Flyweight</span> Pattern</h1>
+      <p class="subtitle">
+        Flyweight is a structural design pattern that lets you fit more objects into available RAM
+        by sharing common parts of state between multiple objects.
+      </p>
+    </header>
+
+    <section class="card">
+      <h2>Intent</h2>
+      <p>
+        Flyweight allows efficient memory usage by separating shared (intrinsic) and unique (extrinsic)
+        object states, reducing RAM consumption when many similar objects exist.
+      </p>
+    </section>
+
+    <section class="card">
+      <h2>Problem</h2>
+      <p>
+        In a game with thousands of bullets, missiles, and particles, each object held duplicated data
+        (like color and sprite). When memory ran out, the game crashed — showing the need to share common state.
+      </p>
+    </section>
+
+    <section class="card">
+      <h2>Solution</h2>
+      <p>
+        Separate the object's data into:
+      </p>
+      <ul>
+        <li><strong>Intrinsic state</strong> — shared and immutable (e.g. sprite, color).</li>
+        <li><strong>Extrinsic state</strong> — unique for each instance (e.g. coordinates, speed).</li>
+      </ul>
+      <p>
+        Store intrinsic data in flyweight objects and extrinsic data externally. Use a factory
+        to manage existing flyweights and reuse them when possible.
+      </p>
+    </section>
+
+    <section class="card">
+      <h2>Pseudocode</h2>
+      <pre><code>
+// The flyweight class stores shared (intrinsic) state
+class TreeType {
+    String name;
+    String color;
+    String texture;
+
+    TreeType(String name, String color, String texture) { ... }
+
+    void draw(Canvas canvas, int x, int y) {
+        // Draw tree of this type at given position
+    }
+}
+
+// Factory that reuses existing flyweights
+class TreeFactory {
+    static List&lt;TreeType&gt; types = new ArrayList&lt;&gt;();
+
+    static TreeType getTreeType(String name, String color, String texture) {
+        for (TreeType t : types)
+            if (t.name.equals(name) && t.color.equals(color) && t.texture.equals(texture))
+                return t;
+        TreeType type = new TreeType(name, color, texture);
+        types.add(type);
+        return type;
+    }
+}
+
+// Context class holds extrinsic state
+class Tree {
+    int x, y;
+    TreeType type;
+
+    Tree(int x, int y, TreeType type) { ... }
+
+    void draw(Canvas canvas) {
+        type.draw(canvas, x, y);
+    }
+}
+
+// Client example
+class Forest {
+    List&lt;Tree&gt; trees = new ArrayList&lt;&gt;();
+
+    void plantTree(int x, int y, String name, String color, String texture) {
+        TreeType type = TreeFactory.getTreeType(name, color, texture);
+        trees.add(new Tree(x, y, type));
+    }
+
+    void draw(Canvas canvas) {
+        for (Tree tree : trees)
+            tree.draw(canvas);
+    }
+}
+      </code></pre>
+    </section>
+
+    <section class="card">
+      <h2>When to Use</h2>
+      <ul>
+        <li>When your program must support a huge number of similar objects.</li>
+        <li>When RAM usage becomes critical.</li>
+        <li>When objects contain duplicate data that can be shared.</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2>Pros and Cons</h2>
+      <ul>
+        <li>✅ Saves a lot of RAM by sharing common state.</li>
+        <li>⚠️ Increases complexity and CPU usage due to managing extrinsic data.</li>
+        <li>⚠️ Harder for new developers to understand state separation.</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2>Relations with Other Patterns</h2>
+      <ul>
+        <li>Can be combined with <strong>Composite</strong> to share leaf nodes.</li>
+        <li>Similar to <strong>Singleton</strong> when only one flyweight exists.</li>
+        <li><strong>Flyweight</strong> shares small objects, <strong>Facade</strong> wraps large subsystems.</li>
+      </ul>
+    </section>
+
+    <footer>
+      © 2025 Design Patterns Guide
+    </footer>
+  </div>
+
+  <script>
+    function goHome() {
+      window.location.href = '/';
+    }
+  </script>
+</body>
+
+</html>
