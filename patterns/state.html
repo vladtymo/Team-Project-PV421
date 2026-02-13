@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Патерн State (Стан)</title>
+<style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      margin: 0; padding: 20px;
+      background: #1e1e3f;
+      color: #cfd8fc;
+    }
+    h1, h2, h3 {
+      color: #a1a9ff;
+    }
+    h1 {
+      border-bottom: 3px solid #6f6fff;
+      padding-bottom: 0.3em;
+    }
+    h2 {
+      margin-top: 1.5em;
+      border-bottom: 2px solid #8c85ff;
+      padding-bottom: 0.2em;
+    }
+    p {
+      max-width: 800px;
+    }
+    code, pre {
+      background: #2e2e5e;
+      border-radius: 6px;
+      padding: 0.4em 0.6em;
+      font-family: Consolas, monospace;
+      font-size: 0.9em;
+      color: #d0d7ff;
+    }
+    pre {
+      padding: 1em;
+      overflow-x: auto;
+      max-width: 800px;
+      margin: 0.5em 0 1.5em 0;
+    }
+    ul {
+      max-width: 800px;
+    }
+    blockquote {
+      background: #2f2f61;
+      border-left: 5px solid #7c78ff;
+      margin: 1em 0;
+      padding: 1em 1.2em;
+      font-style: italic;
+      color: #b4b8e8;
+      max-width: 800px;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background: #2a2a55;
+      padding: 25px 35px;
+      box-shadow: 0 0 15px 3px rgba(100, 100, 255, 0.4);
+      border-radius: 10px;
+    }
+    a {
+      color: #a9aaff;
+    }
+    .btn {
+        cursor: pointer;
+        border: 1px solid var(--border);
+        background: linear-gradient(180deg, var(--card), var(--card-2));
+        color: var(--text);
+        padding: 8px 12px;
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+        font-size: 14px;
+      }
+
+      .btn:hover {
+        filter: brightness(1.05);
+      }
+
+      .btn.ghost {
+        background: transparent;
+      }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Патерн проектування: State (Стан)</h1>
+    <h2>Intent (Намір)</h2>
+    <p>
+      State — це поведінковий патерн, який дозволяє об'єкту змінювати свою поведінку залежно від внутрішнього стану.
+      Здається, що об'єкт змінив свій клас.
+    </p>
+
+    <h2>Проблема</h2>
+    <p>
+      Патерн State тісно пов'язаний з концепцією <strong>кінцевого автомата</strong> (Finite-State Machine).
+    </p>
+
+    <h3>Кінцевий автомат</h3>
+    <p>
+      Основна ідея в тому, що у будь-який момент програма може бути у скінченній кількості станів.
+      В залежності від стану програма поводиться по-різному, і переходить між станами за заздалегідь визначеними правилами (трансітами).
+    </p>
+
+    <blockquote>
+      Наприклад, документ може бути у станах: Draft, Moderation та Published. Метод publish поводиться по-різному в кожному з них.
+    </blockquote>
+
+    <h3>Проблеми з умовними конструкціями</h3>
+    <p>
+      Зі збільшенням кількості станів і поведінок код з множиною умовних операторів стає важким для підтримки.
+    </p>
+
+    <pre><code>class Document {
+  field state: string;
+
+  method publish() {
+    switch (state) {
+      case "draft":
+        state = "moderation"; break;
+      case "moderation":
+        if (currentUser.role == "admin")
+          state = "published";
+        break;
+      case "published":
+        // нічого не робити
+        break;
+    }
+  }
+}</code></pre>
+
+    <h2>Рішення</h2>
+    <p>
+      Створюємо класи для кожного стану і переносимо поведінку туди. Головний об'єкт (контекст) делегує роботу відповідному об'єкту стану.
+    </p>
+
+    <blockquote>
+      Перехід між станами відбувається заміною об'єкту стану у контексті.
+    </blockquote>
+
+    <h2>Реальний приклад</h2>
+    <p>
+      Кнопки смартфона поводяться по-різному залежно від стану пристрою: заблоковано, розблоковано чи низький заряд.
+    </p>
+
+    <h2>Структура</h2>
+    <p>
+      Контекст зберігає посилання на об'єкт стану та делегує йому всі станоспецифічні дії через інтерфейс.
+    </p>
+
+    <h2>Псевдокод прикладу</h2>
+    <pre><code>// Контекст AudioPlayer
+class AudioPlayer {
+  field state: State;
+  
+  constructor() {
+    this.state = new ReadyState(this);
+  }
+  
+  method clickPlay() {
+    state.clickPlay();
+  }
+
+  method changeState(state: State) {
+    this.state = state;
+  }
+}
+
+// Абстрактний стан
+abstract class State {
+  protected player: AudioPlayer;
+  constructor(player) { this.player = player; }
+  abstract clickPlay();
+}
+
+// Конкретні стани
+class ReadyState extends State {
+  clickPlay() {
+    player.startPlayback();
+    player.changeState(new PlayingState(player));
+  }
+}
+class PlayingState extends State {
+  clickPlay() {
+    player.stopPlayback();
+    player.changeState(new ReadyState(player));
+  }
+}</code></pre>
+
+    <h2>Застосовність</h2>
+    <ul>
+      <li>Об'єкт поводиться по-різному залежно від свого стану.</li>
+      <li>Кількість станів велика, і вони часто змінюються.</li>
+      <li>Бажано уникнути великої кількості умовних операторів.</li>
+    </ul>
+
+    <h2>Плюси і мінуси</h2>
+    <ul>
+      <li>Покращує принцип єдиної відповідальності — логіка станів у різних класах.</li>
+      <li>Дозволяє легко додавати нові стани без зміни існуючих.</li>
+      <li>Можливо зайвий для невеликої кількості станів.</li>
+    </ul>
+
+    <h2>Відношення з іншими патернами</h2>
+    <p>
+      State схожий на Strategy, але дозволяє станам знати про переходи між собою.
+    </p>
+    <button class="btn">
+        <a class="clear-styles" href="../index.html">Back Home</a>
+      </button>
+  </div>
+  
+</body>
+</html>
+
